@@ -78,3 +78,8 @@ Observe the imports from the `windows` crate. That's just what we needed to make
 
 Also, you can see that this interop is, by definition, unmanaged. That's why we need to wrap our Windows function calls in `unsafe`. It doesn't mean what you think it means.
 
+### Stage 2
+
+Now we'll establish two-way communication over the TCP socket. This introduces the `BufWriter` and `BufReader` structs for handling the transmission and receipt of data.
+
+This stage also introduces the `match` statement, a core flow control structure in Rust. We use it to handle what we're reading from the socket, thereby checking whether the connection has been closed.
