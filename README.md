@@ -83,3 +83,7 @@ Also, you can see that this interop is, by definition, unmanaged. That's why we 
 Now we'll establish two-way communication over the TCP socket. This introduces the `BufWriter` and `BufReader` structs for handling the transmission and receipt of data.
 
 This stage also introduces the `match` statement, a core flow control structure in Rust. We use it to handle what we're reading from the socket, thereby checking whether the connection has been closed.
+
+### Stage 3
+
+Now that we have both send and receive working, it's time to kick off some commands! We'll start with basic Powershell, since it's easy enough. We introduce `std::process` and all its fun tricks here.

