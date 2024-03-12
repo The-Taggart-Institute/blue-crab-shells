@@ -3,7 +3,7 @@ use windows::Win32::UI::WindowsAndMessaging::{MessageBoxA, MESSAGEBOX_STYLE};
 use windows::core::PCSTR;
 use windows::Win32::Foundation::HWND;
 
-const CONNECT_ADDRESS: &str = "192.168.1.111:8001";
+const CONNECT_ADDRESS: &str = "127.0.0.1:8001";
 
 ///
 /// Displays a Windows MessageBox at launch
