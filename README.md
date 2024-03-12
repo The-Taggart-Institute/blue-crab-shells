@@ -62,4 +62,10 @@ Get the [Rust Standard Library](https://doc.rust-lang.org/std/) open right now. 
 
 ## Stages 
 
-* `stage-0`: Our initial prototype to prove communication over TCP
+### Stage 0
+
+Our initial prototype to prove communication over TCP. Nothing fancy, but a few things to note:
+
+- The syntax for importing modules
+- The `Result` type, and how it's handled
+- The clarity of the TCP stack
