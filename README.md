@@ -69,3 +69,12 @@ Our initial prototype to prove communication over TCP. Nothing fancy, but a few 
 - The syntax for importing modules
 - The `Result` type, and how it's handled
 - The clarity of the TCP stack
+
+### Stage 1
+
+Before we do more with that network connection, let's get comfy with the Windows API. We'll simply pop a MessageBox when the agent launches. But "simple" isn't really how Rust rolls. 
+
+Observe the imports from the `windows` crate. That's just what we needed to make a simple popup work! Also note how we're wrapping values in the Windows structs (e.g. `PCSTR`) to make the typing work. 
+
+Also, you can see that this interop is, by definition, unmanaged. That's why we need to wrap our Windows function calls in `unsafe`. It doesn't mean what you think it means.
+
