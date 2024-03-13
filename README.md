@@ -87,3 +87,12 @@ This stage also introduces the `match` statement, a core flow control structure 
 ### Stage 3
 
 Now that we have both send and receive working, it's time to kick off some commands! We'll start with basic Powershell, since it's easy enough. We introduce `std::process` and all its fun tricks here.
+
+### Stage 4
+
+In this stage, we begin to build out our `C2Command` enum and handler. Shell commands are cool, but we'd like to not rely on them. By prepending our input with `!`, we indicate it is a proper C2 command.
+
+But most importantly, we do all this in `cmd` module, so now we know how to modularize our code. 
+
+We haven't implemented either of our starter C2 commands, but we're about to.
+
