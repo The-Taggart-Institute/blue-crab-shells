@@ -102,3 +102,7 @@ A little more restructuring and cleanup here. Many of the changes you see at thi
 
 We've also structured the output to the stream to differentiate between an error and a success.
 
+### Stage 6
+
+Implementation! We use the `winreg` crate to easily access the Windows registry to establish persistence via a common technique. Is it the stealthiest? No, but it beats the command line!
+
