@@ -96,3 +96,9 @@ But most importantly, we do all this in `cmd` module, so now we know how to modu
 
 We haven't implemented either of our starter C2 commands, but we're about to.
 
+### Stage 5
+
+A little more restructuring and cleanup here. Many of the changes you see at this stage are the result of `cargo clippy` making sure we're doing things with best practices. We also add submodules for our two commands, and a handler function.
+
+We've also structured the output to the stream to differentiate between an error and a success.
+

