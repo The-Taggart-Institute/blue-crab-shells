@@ -106,3 +106,6 @@ We've also structured the output to the stream to differentiate between an error
 
 Implementation! We use the `winreg` crate to easily access the Windows registry to establish persistence via a common technique. Is it the stealthiest? No, but it beats the command line!
 
+### Stage 7
+
+Persistence is one thing, but wouldn't it be cool if we could get `SYSTEM` privileges. We can, using the Token Duplication technique! This involves a good deal of Windows API programming, but that's what we're here for. We do fudge a little bit and use a third party crate for enumerated processes, because that is an unreasonable faff.
