@@ -109,3 +109,10 @@ Implementation! We use the `winreg` crate to easily access the Windows registry 
 ### Stage 7
 
 Persistence is one thing, but wouldn't it be cool if we could get `SYSTEM` privileges. We can, using the Token Duplication technique! This involves a good deal of Windows API programming, but that's what we're here for. We do fudge a little bit and use a third party crate for enumerated processes, because that is an unreasonable faff.
+
+
+### Stage 8
+
+In this version, we're going to take our whole project, and make it usable as a...DLL! That's right, Rust can make DLLs! 
+
+To make the project buildable as both a library and a binary, we've heavily restructured the modules for both. Also, look at what we've added to `Cargo.toml`.
