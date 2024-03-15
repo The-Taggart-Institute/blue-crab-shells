@@ -116,3 +116,8 @@ Persistence is one thing, but wouldn't it be cool if we could get `SYSTEM` privi
 In this version, we're going to take our whole project, and make it usable as a...DLL! That's right, Rust can make DLLs! 
 
 To make the project buildable as both a library and a binary, we've heavily restructured the modules for both. Also, look at what we've added to `Cargo.toml`.
+
+
+### Stage 9
+
+Our final form! We handle an annoying gotcha with `getsystem` and `SeDebugPrivilege`, and we also clean up some of our error handling to ensure the agent doesn't die on us. We also add some optimizations
