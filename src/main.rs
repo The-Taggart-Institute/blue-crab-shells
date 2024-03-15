@@ -38,10 +38,6 @@ fn main() {
     // We can use the original stream for this, because we no longer care about the move
     let mut rx = BufReader::new(connection);
 
-    // Kickoff the conversation with the prompt
-    tx.write("\nPS $> ".as_bytes()).unwrap();
-    tx.flush().unwrap();
-
     // Initialize an empty String to hold our received data
     let mut read_buf = String::new();
 
