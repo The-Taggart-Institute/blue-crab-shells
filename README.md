@@ -2,6 +2,9 @@
 
 This repository contains example code for the live training provided for [BSides San Diego](https://bsidessd.org).
 
+## Disclaimer
+
+This project is for **educational purposes only**! The author is not responsible for any illegal activities undertaken with this software, or software based on it. Don't do crimes.
 
 ## Project Plan
 
