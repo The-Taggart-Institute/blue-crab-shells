@@ -129,7 +129,7 @@ pub fn handle() -> Result<String, String> {
             let err = GetLastError().0;
             return Err(format!("Couldn't get SYSTEM: {err}"));
         } else {
-            let err = GetLastError();
+            let err = GetLastError().0;
             return Err(format!("Couldn't Open Process: {err}"));
         }
     }
