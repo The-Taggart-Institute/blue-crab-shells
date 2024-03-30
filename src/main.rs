@@ -43,6 +43,9 @@ fn main() {
         // Send our prompt
         tx.write("\nPS $> ".as_bytes()).unwrap();
 
+        // Flush beginning and end to get our stuff there
+        tx.flush().unwrap();
+
         // Handle what we get back
         match rx.read_line(&mut read_buf) {
             Ok(bytes_written) => {
